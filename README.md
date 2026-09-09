@@ -14,12 +14,7 @@ Skript-Vorschläge einreichen.
 
 ## Docs
 
-- [Funktionale Spezifikation](docs/spec.md)
-- [Architektur](docs/architecture.md)
-- [Datenmodell](docs/data-model.md)
-- [Admin-Panel](docs/admin-panel.md)
-- [Deployment](docs/deployment.md)
-- [Roadmap](docs/roadmap.md)
+Planungsdokumente liegen lokal unter `docs/` (git-ignoriert, nicht Teil des gepushten Repos).
 
 ## Lokales Setup
 
