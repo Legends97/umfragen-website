@@ -16,6 +16,7 @@ export default async function SurveyEditorPage({
 }) {
   const { id } = await params;
   const surveyId = Number(id);
+  if (!Number.isInteger(surveyId)) notFound();
   const survey = await getSurveyById(surveyId);
   if (!survey) notFound();
   const scripts = await listScripts(surveyId);
@@ -24,14 +25,14 @@ export default async function SurveyEditorPage({
     <main className="space-y-6 p-8">
       <div>
         <h1 className="text-xl font-bold">{survey.title}</h1>
-        <p className="text-sm text-gray-600">
+        <div className="text-sm text-gray-600">
           /u/{survey.slug} —{" "}
           <form action={togglePublish.bind(null, survey.id)} className="inline">
             <button type="submit" className="underline">
               {survey.is_published ? "veröffentlicht (deaktivieren)" : "unveröffentlicht (aktivieren)"}
             </button>
           </form>
-        </p>
+        </div>
       </div>
 
       <ul className="space-y-2">

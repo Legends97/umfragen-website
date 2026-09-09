@@ -95,7 +95,7 @@ export async function deleteScript(scriptId: number): Promise<void> {
 }
 
 export async function moveScript(scriptId: number, direction: "up" | "down"): Promise<void> {
-  const { rows } = await sql<Script>`
+  const { rows } = await sql<{ id: number; survey_id: number; sort_order: number }>`
     select id, survey_id, sort_order from scripts where id = ${scriptId}
   `;
   const current = rows[0];
@@ -104,7 +104,7 @@ export async function moveScript(scriptId: number, direction: "up" | "down"): Pr
   const neighborRows =
     direction === "up"
       ? (
-          await sql<Script>`
+          await sql<{ id: number; sort_order: number }>`
             select id, sort_order from scripts
             where survey_id = ${current.survey_id} and sort_order < ${current.sort_order}
             order by sort_order desc
@@ -112,7 +112,7 @@ export async function moveScript(scriptId: number, direction: "up" | "down"): Pr
           `
         ).rows
       : (
-          await sql<Script>`
+          await sql<{ id: number; sort_order: number }>`
             select id, sort_order from scripts
             where survey_id = ${current.survey_id} and sort_order > ${current.sort_order}
             order by sort_order asc

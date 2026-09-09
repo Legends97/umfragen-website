@@ -7,11 +7,17 @@ import {
   deleteSurvey as dbDeleteSurvey,
 } from "@/lib/db";
 import { slugify } from "@/lib/slug";
+import { requireAdmin } from "@/lib/session";
 
 export async function createSurveyAction(
   _prevState: { error?: string } | undefined,
   formData: FormData,
 ) {
+  try {
+    await requireAdmin();
+  } catch {
+    return { error: "Nicht eingeloggt" };
+  }
   const title = formData.get("title");
   const slugInput = formData.get("slug");
   if (typeof title !== "string" || title.trim() === "") {
@@ -37,12 +43,14 @@ export async function createSurveyAction(
 }
 
 export async function togglePublish(surveyId: number) {
+  await requireAdmin();
   await dbTogglePublish(surveyId);
   revalidatePath("/admin/surveys");
   revalidatePath(`/admin/surveys/${surveyId}`);
 }
 
 export async function deleteSurveyAction(surveyId: number) {
+  await requireAdmin();
   await dbDeleteSurvey(surveyId);
   revalidatePath("/admin/surveys");
 }
