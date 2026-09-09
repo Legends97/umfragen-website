@@ -126,3 +126,36 @@ export async function moveScript(scriptId: number, direction: "up" | "down"): Pr
   await sql`update scripts set sort_order = ${neighbor.sort_order} where id = ${current.id}`;
   await sql`update scripts set sort_order = ${current.sort_order} where id = ${neighbor.id}`;
 }
+
+export type Choice = "priority" | "later" | "not_needed";
+
+export async function createResponse(surveyId: number): Promise<number> {
+  const { rows } = await sql<{ id: number }>`
+    insert into responses (survey_id)
+    values (${surveyId})
+    returning id
+  `;
+  return rows[0].id;
+}
+
+export async function createResponseAnswer(
+  responseId: number,
+  scriptId: number,
+  choice: Choice,
+): Promise<void> {
+  await sql`
+    insert into response_answers (response_id, script_id, choice)
+    values (${responseId}, ${scriptId}, ${choice})
+  `;
+}
+
+export async function createSuggestion(
+  surveyId: number,
+  responseId: number,
+  data: { name: string; link: string; description: string | null },
+): Promise<void> {
+  await sql`
+    insert into suggestions (survey_id, response_id, name, link, description)
+    values (${surveyId}, ${responseId}, ${data.name}, ${data.link}, ${data.description})
+  `;
+}
