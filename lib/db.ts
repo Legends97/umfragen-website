@@ -53,3 +53,76 @@ export async function togglePublish(id: number): Promise<void> {
 export async function deleteSurvey(id: number): Promise<void> {
   await sql`delete from surveys where id = ${id}`;
 }
+
+export type Script = {
+  id: number;
+  survey_id: number;
+  title: string;
+  description: string | null;
+  image_url: string;
+  link: string;
+  sort_order: number;
+};
+
+export async function listScripts(surveyId: number): Promise<Script[]> {
+  const { rows } = await sql<Script>`
+    select id, survey_id, title, description, image_url, link, sort_order
+    from scripts
+    where survey_id = ${surveyId}
+    order by sort_order asc, id asc
+  `;
+  return rows;
+}
+
+export async function createScript(
+  surveyId: number,
+  data: { title: string; description: string | null; imageUrl: string; link: string },
+): Promise<Script> {
+  const { rows: maxRows } = await sql<{ max: number | null }>`
+    select max(sort_order) as max from scripts where survey_id = ${surveyId}
+  `;
+  const nextOrder = (maxRows[0]?.max ?? -1) + 1;
+  const { rows } = await sql<Script>`
+    insert into scripts (survey_id, title, description, image_url, link, sort_order)
+    values (${surveyId}, ${data.title}, ${data.description}, ${data.imageUrl}, ${data.link}, ${nextOrder})
+    returning id, survey_id, title, description, image_url, link, sort_order
+  `;
+  return rows[0];
+}
+
+export async function deleteScript(scriptId: number): Promise<void> {
+  await sql`delete from scripts where id = ${scriptId}`;
+}
+
+export async function moveScript(scriptId: number, direction: "up" | "down"): Promise<void> {
+  const { rows } = await sql<Script>`
+    select id, survey_id, sort_order from scripts where id = ${scriptId}
+  `;
+  const current = rows[0];
+  if (!current) return;
+
+  const neighborRows =
+    direction === "up"
+      ? (
+          await sql<Script>`
+            select id, sort_order from scripts
+            where survey_id = ${current.survey_id} and sort_order < ${current.sort_order}
+            order by sort_order desc
+            limit 1
+          `
+        ).rows
+      : (
+          await sql<Script>`
+            select id, sort_order from scripts
+            where survey_id = ${current.survey_id} and sort_order > ${current.sort_order}
+            order by sort_order asc
+            limit 1
+          `
+        ).rows;
+
+  const neighbor = neighborRows[0];
+  if (!neighbor) return;
+
+  await sql`update scripts set sort_order = ${neighbor.sort_order} where id = ${current.id}`;
+  await sql`update scripts set sort_order = ${current.sort_order} where id = ${neighbor.id}`;
+}
