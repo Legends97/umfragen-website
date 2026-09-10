@@ -54,7 +54,7 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
                 href={script.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-1 inline-block text-sm font-medium text-blue-600 underline underline-offset-2 hover:text-blue-800"
+                className="mt-1 inline-block break-all text-sm font-medium text-blue-600 underline underline-offset-2 hover:text-blue-800"
               >
                 {script.link}
               </a>
