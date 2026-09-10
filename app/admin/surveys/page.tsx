@@ -2,6 +2,7 @@ import { listSurveys } from "@/lib/db";
 import { logout } from "../actions";
 import { createSurveyAction, togglePublish, deleteSurveyAction } from "./actions";
 import { NewSurveyForm } from "./new-survey-form";
+import { CopyLinkButton } from "./copy-link-button";
 
 // Force dynamic rendering: this route is gated by middleware auth and reads
 // live DB state on every request. Without this, `next build` tries to
@@ -40,9 +41,15 @@ export default async function AdminSurveysPage() {
                 </a>
               </td>
               <td>
-                <a href={`/u/${survey.slug}`} target="_blank" className="text-blue-600 underline">
+                <a
+                  href={`/u/${survey.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline"
+                >
                   /u/{survey.slug}
-                </a>
+                </a>{" "}
+                — <CopyLinkButton slug={survey.slug} />
               </td>
               <td>
                 <form action={togglePublish.bind(null, survey.id)}>
