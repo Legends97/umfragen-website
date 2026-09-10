@@ -4,7 +4,7 @@ export default function Home() {
       <div className="text-center">
         <h1 className="text-2xl font-bold">Skript-Umfrage</h1>
         <p className="mt-2 text-gray-600">
-          Admin-Panel: <a className="underline" href="/admin">/admin</a>
+          Diese Seite benötigt einen Umfrage-Link.
         </p>
       </div>
     </main>
