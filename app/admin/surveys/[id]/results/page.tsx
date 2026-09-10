@@ -35,7 +35,7 @@ export default async function ResultsPage({
         </a>
         <p className="mt-2 flex items-center gap-3 text-gray-600">
           {totalResponses} Antworten insgesamt
-          {totalResponses > 0 && <ResetResponsesButton surveyId={survey.id} />}
+          <ResetResponsesButton surveyId={survey.id} />
         </p>
       </div>
 
