@@ -63,7 +63,7 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
               {CHOICES.map((c) => (
                 <label
                   key={c.value}
-                  className="flex-1 cursor-pointer rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-center text-sm font-medium text-gray-300 transition-colors hover:border-gray-600 has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-500 has-[:checked]:text-white"
+                  className="flex flex-1 cursor-pointer items-center justify-center rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-center text-sm font-medium text-gray-300 transition-colors hover:border-gray-600 has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-500 has-[:checked]:text-white"
                 >
                   <input
                     type="radio"
