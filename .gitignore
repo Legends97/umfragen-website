@@ -45,6 +45,8 @@ next-env.d.ts
 docs/
 .superpowers/
 .claude
-AGENTS.md 
+AGENTS.md
 CLAUDE.md
+.agents/
+skills-lock.json
 
