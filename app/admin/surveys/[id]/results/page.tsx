@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getSurveyById, countResponses, getScriptTallies, listSuggestions } from "@/lib/db";
 import { ScriptMedia } from "@/components/script-media";
+import { ResetResponsesButton } from "./reset-button";
 
 // Force dynamic rendering: liest live DB-Daten in einer Server Component mit
 // dynamischem Routenparameter, ohne cookies()/headers() als impliziten Trigger.
@@ -32,7 +33,10 @@ export default async function ResultsPage({
         <a href={`/admin/surveys/${survey.id}`} className="text-sm underline">
           zurück zum Editor
         </a>
-        <p className="mt-2 text-gray-600">{totalResponses} Antworten insgesamt</p>
+        <p className="mt-2 flex items-center gap-3 text-gray-600">
+          {totalResponses} Antworten insgesamt
+          {totalResponses > 0 && <ResetResponsesButton surveyId={survey.id} />}
+        </p>
       </div>
 
       {tallies.length === 0 ? (

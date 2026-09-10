@@ -283,3 +283,8 @@ export async function listSuggestions(surveyId: number): Promise<Suggestion[]> {
   `;
   return rows;
 }
+
+export async function deleteResponses(surveyId: number): Promise<void> {
+  // Cascades to response_answers and suggestions.response_id via FK constraints.
+  await sql`delete from responses where survey_id = ${surveyId}`;
+}
