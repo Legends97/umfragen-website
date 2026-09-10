@@ -34,8 +34,8 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
         {scripts.map((script) => (
           <fieldset
             key={script.id}
-            className={`space-y-4 rounded-2xl border bg-white p-5 shadow-sm transition-colors ${
-              state?.errors?.[script.id] ? "border-red-400" : "border-gray-200"
+            className={`space-y-4 rounded-2xl border-2 bg-white p-5 shadow-md transition-colors ${
+              state?.errors?.[script.id] ? "border-red-400" : "border-amber-100"
             }`}
           >
             <ScriptMedia
@@ -63,7 +63,7 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
               {CHOICES.map((c) => (
                 <label
                   key={c.value}
-                  className="flex-1 cursor-pointer rounded-lg border border-gray-300 px-4 py-2.5 text-center text-sm font-medium text-gray-700 transition-colors has-[:checked]:border-black has-[:checked]:bg-black has-[:checked]:text-white"
+                  className="flex-1 cursor-pointer rounded-lg border-2 border-amber-200 bg-amber-50/50 px-4 py-2.5 text-center text-sm font-semibold text-gray-700 transition-colors hover:border-amber-300 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-500 has-[:checked]:text-white"
                 >
                   <input
                     type="radio"
@@ -83,33 +83,33 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
         ))}
       </div>
 
-      <fieldset className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <fieldset className="space-y-4 rounded-2xl border-2 border-amber-100 bg-white p-5 shadow-md">
         <div>
           <legend className="text-lg font-semibold text-gray-900">Sonstiges</legend>
           <p className="mt-1 text-sm text-gray-600">Fehlt ein Skript? Schlag gerne eins vor.</p>
         </div>
         {suggestions.map((suggestion, index) => (
-          <div key={index} className="space-y-2 rounded-xl border border-gray-200 bg-gray-50 p-4">
+          <div key={index} className="space-y-2 rounded-xl border border-amber-100 bg-amber-50/50 p-4">
             <input
               placeholder="Name"
               value={suggestion.name}
               onChange={(e) => updateSuggestion(index, "name", e.target.value)}
               maxLength={200}
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 focus:outline-none"
             />
             <input
               placeholder="Link"
               value={suggestion.link}
               onChange={(e) => updateSuggestion(index, "link", e.target.value)}
               maxLength={1000}
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 focus:outline-none"
             />
             <input
               placeholder="Beschreibung (optional)"
               value={suggestion.description}
               onChange={(e) => updateSuggestion(index, "description", e.target.value)}
               maxLength={1000}
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 focus:outline-none"
             />
             <button
               type="button"
@@ -123,7 +123,7 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
         <button
           type="button"
           onClick={addSuggestion}
-          className="w-full rounded-lg border-2 border-dashed border-gray-300 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-800"
+          className="w-full rounded-lg border-2 border-dashed border-amber-300 py-2.5 text-sm font-semibold text-amber-700 transition-colors hover:border-amber-400 hover:bg-amber-50"
         >
           + eigenes Skript vorschlagen
         </button>
@@ -138,7 +138,7 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-xl bg-black px-4 py-3 text-base font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+        className="w-full rounded-xl bg-amber-500 px-4 py-3 text-base font-bold text-white shadow-lg shadow-amber-500/30 transition-colors hover:bg-amber-600 disabled:opacity-50"
       >
         {pending ? "Sendet…" : "Absenden"}
       </button>
