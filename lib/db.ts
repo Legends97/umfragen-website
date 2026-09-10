@@ -44,6 +44,10 @@ export async function createSurvey(slug: string, title: string): Promise<Survey>
   return rows[0];
 }
 
+export async function updateSurveyTitle(id: number, title: string): Promise<void> {
+  await sql`update surveys set title = ${title} where id = ${id}`;
+}
+
 export async function togglePublish(id: number): Promise<void> {
   await sql`
     update surveys set is_published = not is_published where id = ${id}

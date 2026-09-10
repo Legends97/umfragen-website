@@ -5,8 +5,18 @@ import {
   createScript as dbCreateScript,
   deleteScript as dbDeleteScript,
   moveScript,
+  updateSurveyTitle,
 } from "@/lib/db";
 import { requireAdmin } from "@/lib/session";
+
+export async function updateTitle(surveyId: number, formData: FormData) {
+  await requireAdmin();
+  const title = formData.get("title");
+  if (typeof title !== "string" || title.trim() === "") throw new Error("Titel erforderlich");
+  await updateSurveyTitle(surveyId, title.trim());
+  revalidatePath(`/admin/surveys/${surveyId}`);
+  revalidatePath("/admin/surveys");
+}
 
 export async function createScript(surveyId: number, formData: FormData) {
   await requireAdmin();

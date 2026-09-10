@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getSurveyById, listScripts } from "@/lib/db";
 import { togglePublish } from "../actions";
-import { deleteScript, moveScriptUp, moveScriptDown } from "./actions";
+import { deleteScript, moveScriptUp, moveScriptDown, updateTitle } from "./actions";
 import { ScriptForm } from "./script-form";
 
 // Force dynamic rendering: this route is gated by middleware auth and reads
@@ -24,8 +24,18 @@ export default async function SurveyEditorPage({
   return (
     <main className="space-y-6 p-8">
       <div>
-        <h1 className="text-xl font-bold">{survey.title}</h1>
-        <div className="text-sm text-gray-600">
+        <form action={updateTitle.bind(null, survey.id)} className="flex items-center gap-2">
+          <input
+            name="title"
+            defaultValue={survey.title}
+            required
+            className="rounded border px-2 py-1 text-xl font-bold"
+          />
+          <button type="submit" className="text-sm underline">
+            Speichern
+          </button>
+        </form>
+        <div className="mt-1 text-sm text-gray-600">
           /u/{survey.slug} —{" "}
           <form action={togglePublish.bind(null, survey.id)} className="inline">
             <button type="submit" className="underline">
