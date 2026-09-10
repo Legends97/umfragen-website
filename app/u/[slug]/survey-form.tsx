@@ -38,7 +38,7 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
           <a href={script.link} target="_blank" className="text-sm text-blue-600 underline">
             {script.link}
           </a>
-          <div className="flex gap-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
             {CHOICES.map((c) => (
               <label key={c.value} className="flex items-center gap-1">
                 <input type="radio" name={`choice_${script.id}`} value={c.value} required />
