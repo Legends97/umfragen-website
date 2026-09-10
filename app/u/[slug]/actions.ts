@@ -31,6 +31,11 @@ export async function submitResponse(
   _prevState: SubmitState | undefined,
   formData: FormData,
 ): Promise<SubmitState> {
+  const cookieStore = await cookies();
+  if (cookieStore.get(`survey_${slug}_done`)?.value === "1") {
+    redirect(`/u/${slug}`);
+  }
+
   const survey = await getSurveyBySlug(slug);
   if (!survey || !survey.is_published) {
     return { generalError: "Umfrage nicht gefunden" };
@@ -107,7 +112,6 @@ export async function submitResponse(
     return { generalError: "Speichern fehlgeschlagen, bitte erneut versuchen" };
   }
 
-  const cookieStore = await cookies();
   cookieStore.set(`survey_${slug}_done`, "1", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
