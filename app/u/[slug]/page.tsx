@@ -17,8 +17,8 @@ export default async function PublicSurveyPage({
 
   if (alreadyDone) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-amber-50 via-white to-white p-4">
-        <div className="w-full max-w-md rounded-2xl border border-amber-100 bg-white p-8 text-center shadow-md">
+      <main className="flex min-h-screen items-center justify-center bg-amber-100 p-4">
+        <div className="w-full max-w-md rounded-2xl border-4 border-amber-400 bg-white p-8 text-center shadow-lg">
           <h1 className="text-xl font-bold text-gray-900">Danke für deine Teilnahme!</h1>
           <p className="mt-2 text-gray-600">Du hast an dieser Umfrage bereits teilgenommen.</p>
         </div>
@@ -29,9 +29,13 @@ export default async function PublicSurveyPage({
   const scripts = await listScripts(survey.id);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-white px-4 py-10">
-      <div className="mx-auto max-w-4xl space-y-6">
-        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">{survey.title}</h1>
+    <main className="min-h-screen bg-amber-100">
+      <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 px-4 py-8 shadow-md">
+        <h1 className="mx-auto max-w-4xl text-3xl font-extrabold tracking-tight text-white">
+          {survey.title}
+        </h1>
+      </div>
+      <div className="mx-auto max-w-4xl space-y-6 px-4 py-8">
         <SurveyForm slug={slug} scripts={scripts} />
       </div>
     </main>

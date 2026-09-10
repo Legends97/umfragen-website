@@ -34,10 +34,12 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
         {scripts.map((script) => (
           <fieldset
             key={script.id}
-            className={`space-y-4 rounded-2xl border-2 bg-white p-5 shadow-md transition-colors ${
-              state?.errors?.[script.id] ? "border-red-400" : "border-amber-100"
+            className={`overflow-hidden rounded-2xl border-4 bg-white shadow-lg transition-colors ${
+              state?.errors?.[script.id] ? "border-red-400" : "border-amber-400"
             }`}
           >
+            <div className="h-2 w-full bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500" />
+            <div className="space-y-4 p-5">
             <ScriptMedia
               mediaType={script.media_type}
               imageUrl={script.image_url}
@@ -63,7 +65,7 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
               {CHOICES.map((c) => (
                 <label
                   key={c.value}
-                  className="flex-1 cursor-pointer rounded-lg border-2 border-amber-200 bg-amber-50/50 px-4 py-2.5 text-center text-sm font-semibold text-gray-700 transition-colors hover:border-amber-300 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-500 has-[:checked]:text-white"
+                  className="flex-1 cursor-pointer rounded-lg border-2 border-amber-300 bg-amber-100 px-4 py-2.5 text-center text-sm font-semibold text-amber-900 transition-colors hover:bg-amber-200 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-500 has-[:checked]:text-white"
                 >
                   <input
                     type="radio"
@@ -79,17 +81,18 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
             {state?.errors?.[script.id] && (
               <p className="text-sm font-medium text-red-600">{state.errors[script.id]}</p>
             )}
+            </div>
           </fieldset>
         ))}
       </div>
 
-      <fieldset className="space-y-4 rounded-2xl border-2 border-amber-100 bg-white p-5 shadow-md">
+      <fieldset className="space-y-4 rounded-2xl border-4 border-amber-400 bg-white p-5 shadow-lg">
         <div>
           <legend className="text-lg font-semibold text-gray-900">Sonstiges</legend>
           <p className="mt-1 text-sm text-gray-600">Fehlt ein Skript? Schlag gerne eins vor.</p>
         </div>
         {suggestions.map((suggestion, index) => (
-          <div key={index} className="space-y-2 rounded-xl border border-amber-100 bg-amber-50/50 p-4">
+          <div key={index} className="space-y-2 rounded-xl border-2 border-amber-300 bg-amber-100 p-4">
             <input
               placeholder="Name"
               value={suggestion.name}
