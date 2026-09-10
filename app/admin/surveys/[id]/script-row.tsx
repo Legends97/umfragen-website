@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Script } from "@/lib/db";
 import { ScriptForm } from "./script-form";
+import { ScriptMedia } from "@/components/script-media";
 import { deleteScript, moveScriptUp, moveScriptDown } from "./actions";
 
 export function ScriptRow({ surveyId, script }: { surveyId: number; script: Script }) {
@@ -25,8 +26,13 @@ export function ScriptRow({ surveyId, script }: { surveyId: number; script: Scri
 
   return (
     <li className="flex items-center gap-3 rounded border p-3">
-      {/* ponytail: <img> statt next/image, siehe Global Constraints */}
-      <img src={script.image_url} alt="" className="h-12 w-12 rounded object-cover" />
+      <ScriptMedia
+        mediaType={script.media_type}
+        imageUrl={script.image_url}
+        youtubeUrl={script.youtube_url}
+        alt=""
+        className="w-40 aspect-video rounded"
+      />
       <div className="flex-1">
         <p className="font-medium">{script.title}</p>
         <a

@@ -11,9 +11,15 @@ create table if not exists scripts (
   survey_id integer not null references surveys(id) on delete cascade,
   title text not null,
   description text,
-  image_url text not null,
+  media_type text not null default 'image' check (media_type in ('image', 'youtube')),
+  image_url text,
+  youtube_url text,
   link text not null,
-  sort_order integer not null default 0
+  sort_order integer not null default 0,
+  check (
+    (media_type = 'image' and image_url is not null and youtube_url is null) or
+    (media_type = 'youtube' and youtube_url is not null and image_url is null)
+  )
 );
 
 create table if not exists responses (

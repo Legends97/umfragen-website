@@ -58,19 +58,33 @@ export async function deleteSurvey(id: number): Promise<void> {
   await sql`delete from surveys where id = ${id}`;
 }
 
+export type MediaType = "image" | "youtube";
+
 export type Script = {
   id: number;
   survey_id: number;
   title: string;
   description: string | null;
-  image_url: string;
+  media_type: MediaType;
+  image_url: string | null;
+  youtube_url: string | null;
   link: string;
   sort_order: number;
 };
 
+type ScriptMedia =
+  | { mediaType: "image"; imageUrl: string }
+  | { mediaType: "youtube"; youtubeUrl: string };
+
+type ScriptInput = {
+  title: string;
+  description: string | null;
+  link: string;
+} & ScriptMedia;
+
 export async function listScripts(surveyId: number): Promise<Script[]> {
   const { rows } = await sql<Script>`
-    select id, survey_id, title, description, image_url, link, sort_order
+    select id, survey_id, title, description, media_type, image_url, youtube_url, link, sort_order
     from scripts
     where survey_id = ${surveyId}
     order by sort_order asc, id asc
@@ -78,18 +92,17 @@ export async function listScripts(surveyId: number): Promise<Script[]> {
   return rows;
 }
 
-export async function createScript(
-  surveyId: number,
-  data: { title: string; description: string | null; imageUrl: string; link: string },
-): Promise<Script> {
+export async function createScript(surveyId: number, data: ScriptInput): Promise<Script> {
   const { rows: maxRows } = await sql<{ max: number | null }>`
     select max(sort_order) as max from scripts where survey_id = ${surveyId}
   `;
   const nextOrder = (maxRows[0]?.max ?? -1) + 1;
+  const imageUrl = data.mediaType === "image" ? data.imageUrl : null;
+  const youtubeUrl = data.mediaType === "youtube" ? data.youtubeUrl : null;
   const { rows } = await sql<Script>`
-    insert into scripts (survey_id, title, description, image_url, link, sort_order)
-    values (${surveyId}, ${data.title}, ${data.description}, ${data.imageUrl}, ${data.link}, ${nextOrder})
-    returning id, survey_id, title, description, image_url, link, sort_order
+    insert into scripts (survey_id, title, description, media_type, image_url, youtube_url, link, sort_order)
+    values (${surveyId}, ${data.title}, ${data.description}, ${data.mediaType}, ${imageUrl}, ${youtubeUrl}, ${data.link}, ${nextOrder})
+    returning id, survey_id, title, description, media_type, image_url, youtube_url, link, sort_order
   `;
   return rows[0];
 }
@@ -100,7 +113,7 @@ export async function deleteScript(scriptId: number): Promise<void> {
 
 export async function getScriptById(scriptId: number): Promise<Script | null> {
   const { rows } = await sql<Script>`
-    select id, survey_id, title, description, image_url, link, sort_order
+    select id, survey_id, title, description, media_type, image_url, youtube_url, link, sort_order
     from scripts
     where id = ${scriptId}
   `;
@@ -109,13 +122,17 @@ export async function getScriptById(scriptId: number): Promise<Script | null> {
 
 export async function updateScript(
   scriptId: number,
-  data: { title: string; description: string | null; imageUrl: string; link: string },
+  data: ScriptInput,
 ): Promise<void> {
+  const imageUrl = data.mediaType === "image" ? data.imageUrl : null;
+  const youtubeUrl = data.mediaType === "youtube" ? data.youtubeUrl : null;
   await sql`
     update scripts
     set title = ${data.title},
         description = ${data.description},
-        image_url = ${data.imageUrl},
+        media_type = ${data.mediaType},
+        image_url = ${imageUrl},
+        youtube_url = ${youtubeUrl},
         link = ${data.link}
     where id = ${scriptId}
   `;
@@ -203,7 +220,9 @@ export async function countResponses(surveyId: number): Promise<number> {
 export type ScriptTally = {
   script_id: number;
   title: string;
-  image_url: string;
+  media_type: MediaType;
+  image_url: string | null;
+  youtube_url: string | null;
   priority_count: number;
   later_count: number;
   not_needed_count: number;
@@ -213,7 +232,9 @@ export async function getScriptTallies(surveyId: number): Promise<ScriptTally[]>
   const { rows } = await sql<{
     script_id: number;
     title: string;
-    image_url: string;
+    media_type: MediaType;
+    image_url: string | null;
+    youtube_url: string | null;
     priority_count: string;
     later_count: string;
     not_needed_count: string;
@@ -221,20 +242,24 @@ export async function getScriptTallies(surveyId: number): Promise<ScriptTally[]>
     select
       s.id as script_id,
       s.title,
+      s.media_type,
       s.image_url,
+      s.youtube_url,
       coalesce(sum(case when ra.choice = 'priority' then 1 else 0 end), 0) as priority_count,
       coalesce(sum(case when ra.choice = 'later' then 1 else 0 end), 0) as later_count,
       coalesce(sum(case when ra.choice = 'not_needed' then 1 else 0 end), 0) as not_needed_count
     from scripts s
     left join response_answers ra on ra.script_id = s.id
     where s.survey_id = ${surveyId}
-    group by s.id, s.title, s.image_url, s.sort_order
+    group by s.id, s.title, s.media_type, s.image_url, s.youtube_url, s.sort_order
     order by s.sort_order asc, s.id asc
   `;
   return rows.map((row) => ({
     script_id: row.script_id,
     title: row.title,
+    media_type: row.media_type,
     image_url: row.image_url,
+    youtube_url: row.youtube_url,
     priority_count: Number(row.priority_count),
     later_count: Number(row.later_count),
     not_needed_count: Number(row.not_needed_count),

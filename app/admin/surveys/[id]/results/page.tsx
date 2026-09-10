@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getSurveyById, countResponses, getScriptTallies, listSuggestions } from "@/lib/db";
+import { ScriptMedia } from "@/components/script-media";
 
 // Force dynamic rendering: liest live DB-Daten in einer Server Component mit
 // dynamischem Routenparameter, ohne cookies()/headers() als impliziten Trigger.
@@ -43,8 +44,13 @@ export default async function ResultsPage({
             const percent = (count: number) => (total === 0 ? 0 : Math.round((count / total) * 100));
             return (
               <li key={tally.script_id} className="flex items-start gap-3 rounded border p-4">
-                {/* ponytail: <img> statt next/image, siehe Global Constraints */}
-                <img src={tally.image_url} alt="" className="h-16 w-16 rounded object-cover" />
+                <ScriptMedia
+                  mediaType={tally.media_type}
+                  imageUrl={tally.image_url}
+                  youtubeUrl={tally.youtube_url}
+                  alt=""
+                  className="w-40 aspect-video rounded"
+                />
                 <div className="flex-1 space-y-1">
                   <p className="font-medium">{tally.title}</p>
                   <p className="text-sm text-gray-600">

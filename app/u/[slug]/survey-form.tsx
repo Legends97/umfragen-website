@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { submitResponse } from "./actions";
 import { CHOICES, type Script } from "@/lib/db";
+import { ScriptMedia } from "@/components/script-media";
 
 type Suggestion = { name: string; link: string; description: string };
 
@@ -31,8 +32,13 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
 
       {scripts.map((script) => (
         <fieldset key={script.id} className="space-y-2 rounded border p-4">
-          {/* ponytail: <img> statt next/image, siehe docs/superpowers/plans Phase 2 Global Constraints */}
-          <img src={script.image_url} alt="" className="h-24 w-24 rounded object-cover" />
+          <ScriptMedia
+            mediaType={script.media_type}
+            imageUrl={script.image_url}
+            youtubeUrl={script.youtube_url}
+            alt=""
+            className="w-full max-w-sm aspect-video rounded"
+          />
           <legend className="font-medium">{script.title}</legend>
           {script.description && <p className="text-sm text-gray-600">{script.description}</p>}
           <a href={script.link} target="_blank" className="text-sm text-blue-600 underline">

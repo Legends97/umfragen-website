@@ -3,7 +3,7 @@
 import { upload } from "@vercel/blob/client";
 import { useState } from "react";
 import { createScript, updateScript } from "./actions";
-import type { Script } from "@/lib/db";
+import type { MediaType, Script } from "@/lib/db";
 
 export function ScriptForm({
   surveyId,
@@ -16,27 +16,39 @@ export function ScriptForm({
 }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<MediaType>(script?.media_type ?? "image");
   const isEdit = script !== undefined;
 
   async function handleSubmit(formData: FormData) {
     setError(null);
-    const file = formData.get("image");
-    const hasFile = file instanceof File && file.size > 0;
-    if (!isEdit && !hasFile) {
-      setError("Bild ist Pflicht");
-      return;
+    formData.set("mediaType", mode);
+
+    if (mode === "image") {
+      const file = formData.get("image");
+      const hasFile = file instanceof File && file.size > 0;
+      if (!isEdit && !hasFile) {
+        setError("Bild ist Pflicht");
+        return;
+      }
+      if (hasFile) {
+        setUploading(true);
+        try {
+          const blob = await upload((file as File).name, file as File, {
+            access: "public",
+            handleUploadUrl: "/api/blob-upload",
+          });
+          formData.set("imageUrl", blob.url);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Upload fehlgeschlagen");
+          setUploading(false);
+          return;
+        }
+        setUploading(false);
+      }
     }
+
     setUploading(true);
     try {
-      if (hasFile) {
-        const blob = await upload((file as File).name, file as File, {
-          access: "public",
-          handleUploadUrl: "/api/blob-upload",
-        });
-        formData.set("imageUrl", blob.url);
-      } else {
-        formData.delete("imageUrl");
-      }
       if (isEdit) {
         await updateScript(surveyId, script.id, formData);
       } else {
@@ -44,7 +56,7 @@ export function ScriptForm({
       }
       onDone?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload fehlgeschlagen");
+      setError(err instanceof Error ? err.message : "Speichern fehlgeschlagen");
     } finally {
       setUploading(false);
     }
@@ -73,10 +85,36 @@ export function ScriptForm({
         required
         className="w-full rounded border px-3 py-2"
       />
-      <input name="image" type="file" accept="image/*" required={!isEdit} className="w-full" />
-      {isEdit && (
-        <p className="text-xs text-gray-500">Bild nur hochladen, wenn du es ersetzen willst.</p>
+
+      <div className="flex gap-4 text-sm">
+        <label className="flex items-center gap-1">
+          <input type="radio" checked={mode === "image"} onChange={() => setMode("image")} />
+          Bild
+        </label>
+        <label className="flex items-center gap-1">
+          <input type="radio" checked={mode === "youtube"} onChange={() => setMode("youtube")} />
+          YouTube-Video
+        </label>
+      </div>
+
+      {mode === "image" ? (
+        <>
+          <input name="image" type="file" accept="image/*" required={!isEdit} className="w-full" />
+          {isEdit && (
+            <p className="text-xs text-gray-500">Bild nur hochladen, wenn du es ersetzen willst.</p>
+          )}
+        </>
+      ) : (
+        <input
+          name="youtubeUrl"
+          type="url"
+          placeholder="YouTube-Link (z.B. https://youtu.be/...)"
+          defaultValue={script?.youtube_url ?? undefined}
+          required
+          className="w-full rounded border px-3 py-2"
+        />
       )}
+
       {error && <p className="text-sm text-red-600">{error}</p>}
       <button
         type="submit"
