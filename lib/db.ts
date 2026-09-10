@@ -227,7 +227,7 @@ export async function listSuggestions(surveyId: number): Promise<Suggestion[]> {
     select id, name, link, description, created_at
     from suggestions
     where survey_id = ${surveyId}
-    order by created_at desc
+    order by created_at desc, id desc
   `;
   return rows;
 }
