@@ -98,6 +98,29 @@ export async function deleteScript(scriptId: number): Promise<void> {
   await sql`delete from scripts where id = ${scriptId}`;
 }
 
+export async function getScriptById(scriptId: number): Promise<Script | null> {
+  const { rows } = await sql<Script>`
+    select id, survey_id, title, description, image_url, link, sort_order
+    from scripts
+    where id = ${scriptId}
+  `;
+  return rows[0] ?? null;
+}
+
+export async function updateScript(
+  scriptId: number,
+  data: { title: string; description: string | null; imageUrl: string; link: string },
+): Promise<void> {
+  await sql`
+    update scripts
+    set title = ${data.title},
+        description = ${data.description},
+        image_url = ${data.imageUrl},
+        link = ${data.link}
+    where id = ${scriptId}
+  `;
+}
+
 export async function moveScript(scriptId: number, direction: "up" | "down"): Promise<void> {
   const { rows } = await sql<{ id: number; survey_id: number; sort_order: number }>`
     select id, survey_id, sort_order from scripts where id = ${scriptId}
