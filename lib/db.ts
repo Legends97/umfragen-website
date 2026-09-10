@@ -165,3 +165,69 @@ export async function createSuggestion(
     values (${surveyId}, ${responseId}, ${data.name}, ${data.link}, ${data.description})
   `;
 }
+
+export async function countResponses(surveyId: number): Promise<number> {
+  const { rows } = await sql<{ count: string }>`
+    select count(*) as count from responses where survey_id = ${surveyId}
+  `;
+  return Number(rows[0]?.count ?? 0);
+}
+
+export type ScriptTally = {
+  script_id: number;
+  title: string;
+  image_url: string;
+  priority_count: number;
+  later_count: number;
+  not_needed_count: number;
+};
+
+export async function getScriptTallies(surveyId: number): Promise<ScriptTally[]> {
+  const { rows } = await sql<{
+    script_id: number;
+    title: string;
+    image_url: string;
+    priority_count: string;
+    later_count: string;
+    not_needed_count: string;
+  }>`
+    select
+      s.id as script_id,
+      s.title,
+      s.image_url,
+      coalesce(sum(case when ra.choice = 'priority' then 1 else 0 end), 0) as priority_count,
+      coalesce(sum(case when ra.choice = 'later' then 1 else 0 end), 0) as later_count,
+      coalesce(sum(case when ra.choice = 'not_needed' then 1 else 0 end), 0) as not_needed_count
+    from scripts s
+    left join response_answers ra on ra.script_id = s.id
+    where s.survey_id = ${surveyId}
+    group by s.id, s.title, s.image_url, s.sort_order
+    order by s.sort_order asc, s.id asc
+  `;
+  return rows.map((row) => ({
+    script_id: row.script_id,
+    title: row.title,
+    image_url: row.image_url,
+    priority_count: Number(row.priority_count),
+    later_count: Number(row.later_count),
+    not_needed_count: Number(row.not_needed_count),
+  }));
+}
+
+export type Suggestion = {
+  id: number;
+  name: string;
+  link: string;
+  description: string | null;
+  created_at: string;
+};
+
+export async function listSuggestions(surveyId: number): Promise<Suggestion[]> {
+  const { rows } = await sql<Suggestion>`
+    select id, name, link, description, created_at
+    from suggestions
+    where survey_id = ${surveyId}
+    order by created_at desc
+  `;
+  return rows;
+}
