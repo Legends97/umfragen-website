@@ -30,56 +30,58 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
     <form action={formAction} className="space-y-6">
       <input type="hidden" name="suggestions_json" value={JSON.stringify(suggestions)} />
 
-      {scripts.map((script) => (
-        <fieldset
-          key={script.id}
-          className={`space-y-4 rounded-2xl border bg-white p-5 shadow-sm transition-colors ${
-            state?.errors?.[script.id] ? "border-red-400" : "border-gray-200"
-          }`}
-        >
-          <ScriptMedia
-            mediaType={script.media_type}
-            imageUrl={script.image_url}
-            youtubeUrl={script.youtube_url}
-            alt=""
-            className="w-full max-w-sm aspect-video rounded-xl"
-          />
-          <div>
-            <legend className="text-lg font-semibold text-gray-900">{script.title}</legend>
-            {script.description && (
-              <p className="mt-1 text-sm leading-relaxed text-gray-600">{script.description}</p>
-            )}
-            <a
-              href={script.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-sm font-medium text-blue-600 underline underline-offset-2 hover:text-blue-800"
-            >
-              {script.link}
-            </a>
-          </div>
-          <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
-            {CHOICES.map((c) => (
-              <label
-                key={c.value}
-                className="flex-1 cursor-pointer rounded-lg border border-gray-300 px-4 py-2.5 text-center text-sm font-medium text-gray-700 transition-colors has-[:checked]:border-black has-[:checked]:bg-black has-[:checked]:text-white"
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        {scripts.map((script) => (
+          <fieldset
+            key={script.id}
+            className={`space-y-4 rounded-2xl border bg-white p-5 shadow-sm transition-colors ${
+              state?.errors?.[script.id] ? "border-red-400" : "border-gray-200"
+            }`}
+          >
+            <ScriptMedia
+              mediaType={script.media_type}
+              imageUrl={script.image_url}
+              youtubeUrl={script.youtube_url}
+              alt=""
+              className="w-full max-w-sm aspect-video rounded-xl"
+            />
+            <div>
+              <legend className="text-lg font-semibold text-gray-900">{script.title}</legend>
+              {script.description && (
+                <p className="mt-1 text-sm leading-relaxed text-gray-600">{script.description}</p>
+              )}
+              <a
+                href={script.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-block text-sm font-medium text-blue-600 underline underline-offset-2 hover:text-blue-800"
               >
-                <input
-                  type="radio"
-                  name={`choice_${script.id}`}
-                  value={c.value}
-                  required
-                  className="sr-only"
-                />
-                {c.label}
-              </label>
-            ))}
-          </div>
-          {state?.errors?.[script.id] && (
-            <p className="text-sm font-medium text-red-600">{state.errors[script.id]}</p>
-          )}
-        </fieldset>
-      ))}
+                {script.link}
+              </a>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+              {CHOICES.map((c) => (
+                <label
+                  key={c.value}
+                  className="flex-1 cursor-pointer rounded-lg border border-gray-300 px-4 py-2.5 text-center text-sm font-medium text-gray-700 transition-colors has-[:checked]:border-black has-[:checked]:bg-black has-[:checked]:text-white"
+                >
+                  <input
+                    type="radio"
+                    name={`choice_${script.id}`}
+                    value={c.value}
+                    required
+                    className="sr-only"
+                  />
+                  {c.label}
+                </label>
+              ))}
+            </div>
+            {state?.errors?.[script.id] && (
+              <p className="text-sm font-medium text-red-600">{state.errors[script.id]}</p>
+            )}
+          </fieldset>
+        ))}
+      </div>
 
       <fieldset className="space-y-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <div>
