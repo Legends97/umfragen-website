@@ -31,7 +31,8 @@ export default async function SurveyEditorPage({
             <button type="submit" className="underline">
               {survey.is_published ? "veröffentlicht (deaktivieren)" : "unveröffentlicht (aktivieren)"}
             </button>
-          </form>
+          </form>{" "}
+          — <a href={`/admin/surveys/${survey.id}/results`} className="underline">Ergebnisse</a>
         </div>
       </div>
 
