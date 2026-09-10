@@ -44,3 +44,7 @@ next-env.d.ts
 # Planungsdateien, nicht pushen
 docs/
 .superpowers/
+.claude
+AGENTS.md 
+CLAUDE.md
+
