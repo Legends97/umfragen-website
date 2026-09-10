@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { submitResponse } from "./actions";
-import type { Script } from "@/lib/db";
+import { CHOICES, type Script } from "@/lib/db";
 
 type Suggestion = { name: string; link: string; description: string };
 
@@ -39,18 +39,12 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
             {script.link}
           </a>
           <div className="flex gap-4">
-            <label className="flex items-center gap-1">
-              <input type="radio" name={`choice_${script.id}`} value="priority" required />
-              Priorität
-            </label>
-            <label className="flex items-center gap-1">
-              <input type="radio" name={`choice_${script.id}`} value="later" required />
-              kann später
-            </label>
-            <label className="flex items-center gap-1">
-              <input type="radio" name={`choice_${script.id}`} value="not_needed" required />
-              brauch ich nicht
-            </label>
+            {CHOICES.map((c) => (
+              <label key={c.value} className="flex items-center gap-1">
+                <input type="radio" name={`choice_${script.id}`} value={c.value} required />
+                {c.label}
+              </label>
+            ))}
           </div>
           {state?.errors?.[script.id] && (
             <p className="text-sm text-red-600">{state.errors[script.id]}</p>
@@ -66,18 +60,21 @@ export function SurveyForm({ slug, scripts }: { slug: string; scripts: Script[] 
               placeholder="Name"
               value={suggestion.name}
               onChange={(e) => updateSuggestion(index, "name", e.target.value)}
+              maxLength={200}
               className="w-full rounded border px-3 py-2"
             />
             <input
               placeholder="Link"
               value={suggestion.link}
               onChange={(e) => updateSuggestion(index, "link", e.target.value)}
+              maxLength={1000}
               className="w-full rounded border px-3 py-2"
             />
             <input
               placeholder="Beschreibung (optional)"
               value={suggestion.description}
               onChange={(e) => updateSuggestion(index, "description", e.target.value)}
+              maxLength={1000}
               className="w-full rounded border px-3 py-2"
             />
             <button

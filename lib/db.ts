@@ -129,6 +129,12 @@ export async function moveScript(scriptId: number, direction: "up" | "down"): Pr
 
 export type Choice = "priority" | "later" | "not_needed";
 
+export const CHOICES: { value: Choice; label: string }[] = [
+  { value: "priority", label: "Priorität" },
+  { value: "later", label: "kann später" },
+  { value: "not_needed", label: "brauch ich nicht" },
+];
+
 export async function createResponse(surveyId: number): Promise<number> {
   const { rows } = await sql<{ id: number }>`
     insert into responses (survey_id)

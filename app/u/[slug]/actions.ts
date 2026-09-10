@@ -8,6 +8,7 @@ import {
   createResponse,
   createResponseAnswer,
   createSuggestion,
+  CHOICES,
   type Choice,
 } from "@/lib/db";
 
@@ -16,7 +17,14 @@ export type SubmitState = {
   generalError?: string;
 };
 
-const CHOICES: Choice[] = ["priority", "later", "not_needed"];
+function isValidHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
 export async function submitResponse(
   slug: string,
@@ -34,7 +42,7 @@ export async function submitResponse(
 
   for (const script of scripts) {
     const raw = formData.get(`choice_${script.id}`);
-    if (typeof raw !== "string" || !CHOICES.includes(raw as Choice)) {
+    if (typeof raw !== "string" || !CHOICES.some((c) => c.value === raw)) {
       errors[script.id] = "Bitte eine Option auswählen";
       continue;
     }
@@ -42,7 +50,7 @@ export async function submitResponse(
   }
 
   if (Object.keys(errors).length > 0) {
-    return { errors };
+    return { errors, generalError: "Bitte alle Skripte bewerten" };
   }
 
   let suggestions: { name: string; link: string; description: string | null }[] = [];
@@ -51,36 +59,52 @@ export async function submitResponse(
     try {
       const parsed: unknown = JSON.parse(suggestionsRaw);
       if (Array.isArray(parsed)) {
-        suggestions = parsed
-          .filter(
-            (entry): entry is { name: string; link: string; description?: string } =>
-              typeof entry === "object" &&
-              entry !== null &&
-              typeof (entry as { name?: unknown }).name === "string" &&
-              (entry as { name: string }).name.trim() !== "" &&
-              typeof (entry as { link?: unknown }).link === "string" &&
-              (entry as { link: string }).link.trim() !== "",
-          )
-          .map((entry) => ({
-            name: entry.name.trim(),
-            link: entry.link.trim(),
-            description:
-              typeof entry.description === "string" && entry.description.trim() !== ""
-                ? entry.description.trim()
-                : null,
-          }));
+        suggestions = parsed.reduce<{ name: string; link: string; description: string | null }[]>(
+          (acc, entry) => {
+            if (
+              typeof entry !== "object" ||
+              entry === null ||
+              typeof (entry as { name?: unknown }).name !== "string" ||
+              (entry as { name: string }).name.trim() === "" ||
+              typeof (entry as { link?: unknown }).link !== "string" ||
+              (entry as { link: string }).link.trim() === ""
+            ) {
+              return acc;
+            }
+            const link = (entry as { link: string }).link.trim();
+            if (!isValidHttpUrl(link)) {
+              return acc;
+            }
+            const name = (entry as { name: string }).name.trim();
+            const description = (entry as { description?: unknown }).description;
+            acc.push({
+              name: name.slice(0, 200),
+              link: link.slice(0, 1000),
+              description:
+                typeof description === "string" && description.trim() !== ""
+                  ? description.trim().slice(0, 1000)
+                  : null,
+            });
+            return acc;
+          },
+          [],
+        ).slice(0, 20);
       }
     } catch {
       // Ungültiges JSON wird ignoriert, Hauptabgabe zählt trotzdem.
     }
   }
 
-  const responseId = await createResponse(survey.id);
-  for (const answer of answers) {
-    await createResponseAnswer(responseId, answer.scriptId, answer.choice);
-  }
-  for (const suggestion of suggestions) {
-    await createSuggestion(survey.id, responseId, suggestion);
+  try {
+    const responseId = await createResponse(survey.id);
+    for (const answer of answers) {
+      await createResponseAnswer(responseId, answer.scriptId, answer.choice);
+    }
+    for (const suggestion of suggestions) {
+      await createSuggestion(survey.id, responseId, suggestion);
+    }
+  } catch {
+    return { generalError: "Speichern fehlgeschlagen, bitte erneut versuchen" };
   }
 
   const cookieStore = await cookies();

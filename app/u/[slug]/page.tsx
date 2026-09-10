@@ -3,8 +3,6 @@ import { cookies } from "next/headers";
 import { getSurveyBySlug, listScripts } from "@/lib/db";
 import { SurveyForm } from "./survey-form";
 
-export const dynamic = "force-dynamic";
-
 export default async function PublicSurveyPage({
   params,
 }: {
