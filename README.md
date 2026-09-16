@@ -1,9 +1,9 @@
 # Skript-Umfrage
 
 Live-Umfrage-Website: Owner legt im Admin-Panel Umfragen mit "Skript"-Vorschlägen
-(Titel, Bild, Link) an. Anonyme User bewerten jedes Skript per Checkbox
-(Priorität / kann später / brauch ich nicht) und können am Ende eigene
-Skript-Vorschläge einreichen.
+(Titel, Bild oder YouTube-Video, Link) an. Anonyme User bewerten jedes Skript
+per Checkbox (Priorität / kann später / brauch ich nicht) und können am Ende
+eigene Skript-Vorschläge einreichen.
 
 ## Stack
 
